@@ -1089,6 +1089,26 @@ func TestParser_Parse(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			name: "parse reject fail",
+			s:    "-A foo -j REJECT --reject-with fail-icmp6-adm-prohibited",
+			r:    nil,
+			err:  errors.New(`failed to parse line, skipping rest "" of the line: invalid value for --reject-with`),
+		},
+		{
+			name: "parse reject",
+			s:    "-A foo -j REJECT --reject-with icmp6-adm-prohibited",
+			r: Rule{
+				Chain: "foo",
+				Jump: &Target{
+					Name: "REJECT",
+					Flags: map[string]Flag{
+						"reject-with": {Values: []string{"icmp6-adm-prohibited"}},
+					},
+				},
+			},
+			err: nil,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			p := NewParser(strings.NewReader(tc.s))
